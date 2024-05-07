@@ -1,0 +1,27 @@
+{{ template "header"}}
+    <!-- middle section -->
+    <div id="middlesection" class="flex flex-col flex-1 border border-0 border-green-900 h-full align-items-start">
+        <section class="px-8 py-4">
+            <h2 class="text-xl">Contract</h2>
+            <h2 class="text-2xl">{{ .Title}}</h2>
+
+            <!-- new contract -->
+            <div class="flex py-2">
+                <a href="/contract_bidding?id={{.Id}}" class="flex bg-blue-500 hover:bg-blue-400 text-sm rounded py-2 px-4 text-white">
+                    New Bid
+                </a>
+            </div>
+            <!-- end of new contract -->
+
+           {{ .Message }}
+            
+
+           
+
+
+        </section>
+    </div>
+    <!-- end of middle section -->
+    
+
+{{ template "footer"}}

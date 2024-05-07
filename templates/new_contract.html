@@ -1,0 +1,44 @@
+{{ template "header" }}
+        <!-- middle section -->
+        <div id="middlesection" class="flex flex-col flex-1 border border-0 border-green-900 h-full align-items-start">
+            <section class="px-8 py-4">
+                <h1 class="text-3xl">New Contract</h1>
+
+                {{ if .Success }}
+
+                    {{ if .Status}}
+                        <div class='p-4 mt-2 mb-2 bg-green-100 rounded font-semibold md:w-1/2'>
+                            {{ .Message }}
+                        </div>
+                    {{ else}}
+                        <div class='p-4 mt-2 mb-2 bg-red-100 text-red-800 rounded font-semibold md:w-1/2'>
+                            {{ .Message}}
+                        </div>
+                    {{ end }}
+
+                {{ end }}
+
+                <!-- form-->
+                <form class="mt-4" action="/new_contract" method="POST">
+                        <div class="flex flex-col border border-0 border-gray-200 rounded-sm">
+                                <label class="text-gray-800 font-semibold py-1">Name of Contract</label>
+                                <div class="border border-0 border-blue-900"> 
+                                    <input type="text" name="Name" class="flex border border-1 border-gray-500 inline-block 
+                                                              rounded-md py-2 px-2 w-full md:w-1/2 shadow-lg" required/>
+                                </div>
+                                <div class="py-2">
+                                    <button type="submit" class="bg-blue-500 hover:bg-blue-400 
+                                                                 rounded text-white px-8 py-2 text-sm">Create Contract</button>
+                                </div>
+                        </div>
+                </form>
+                <!-- end of form-->
+
+                
+
+            </section>
+        </div>
+        <!-- end of middle section -->
+
+
+{{ template "footer" }}

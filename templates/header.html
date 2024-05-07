@@ -1,0 +1,79 @@
+{{ define "header"}}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAPS - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: {
+                clifford: '#da373d',
+                gold: '#FFD700',
+              }
+            }
+          }
+        }
+      </script>
+
+      <style>
+              table {
+                  width: 100%;
+                  border-collapse: collapse; /* Ensures borders between cells are merged */
+              }
+
+              th, td {
+                  padding: 8px; /* Adds space around text in cells */
+                  text-align: left; /* Aligns text to the left; adjust as needed */
+                  border: 1px solid #ADD8E6; /* Sets the border color to light blue */
+              }
+
+              th {
+                  background-color: #f0f8ff; /* Lighter header background for contrast */
+              }
+
+              tr:nth-child(even) {
+                  background-color: #f9f9f9; /* Zebra striping for rows */
+              }
+
+              
+      </style>
+</head>
+<body>
+    <div id="main" class="flex flex-col border border-0 border-green-600 min-h-screen justify-between">
+            <!-- top section-->
+            <div id="topsection" class="border border-0 border-blue-900">
+                <header class="flex flex-row bg-blue-800 h-16 items-center px-8">
+                    <!-- logo -->
+                    <div class="flex flex-col border border-0 border-yellow-500">
+                        <div class="text-4xl text-white font-bold" style="font-size: 54px;">
+                            CAPS
+                        </div>                        
+                    </div>
+                    <!-- end of logo -->
+                    <!-- Title -->
+                    <div class="flex flex-col px-2">
+                            <div class="text-white font-semibold text-lg">
+                                    Contract Award Processing System
+                            </div>
+                            <div class="text-gold text-sm text-right">
+                                    Hyberledger-Fabric BCT
+                            </div>
+                    </div>
+                    <!-- end of title -->
+                </header>
+                <nav class="flex px-8 border-b border-0 border-blue-600 py-4">
+                    <div>
+                        <a href="/dashboard">Dashboard</a>
+                    </div>
+
+                                        
+                </nav>
+            </div>
+            <!-- end of top section -->
+
+{{ end }}
