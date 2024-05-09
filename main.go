@@ -44,39 +44,42 @@ type Contract struct {
 
 // --- Bid struct ------------------------
 type Bid struct {
-	id                             string
-	contract_id                    string
-	bidder_name                    string
-	bank_statement_submission      string
-	bank_statement_score           string
-	bank_reference_submission      string
-	bank_reference_score           string
-	cv_submission                  string
-	cv_score                       string
-	certificate_submission         string
-	certificate_score              string
-	awardletter_submission         string
-	awardletter_score              string
-	completionletter_submission    string
-	completionletter_score         string
-	equipment_submission           string
-	equipment_score                string
-	equipment_ownership_submission string
-	equipment_ownership_score      string
-	deviation_submission           string
-	deviation_score                string
-	projects_submission            string
-	projects_score                 string
+	id               string
+	contractId       string
+	bidderName       string
+	bankStatement    string
+	bankReference    string
+	cv               string
+	certificate      string
+	awardletter      string
+	completionletter string
+	equipment        string
+	ownership        string
+	auditedAccount   string
+	projects         string
 }
 
 //---- End of Bid struct -----------------
+
+type BidSectionScore struct {
+	id                   string
+	contract_id          string
+	bidder_name          string
+	financial_capability string
+	qualification        string
+	similar_projects     string
+	technical_capability string
+	audited_account      string
+	projects             string
+	total_score          string
+}
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl.ExecuteTemplate(w, "index.html", nil)
 }
 
 func dashboardHandler(w http.ResponseWriter, r *http.Request) {
-	db := getMySQLDB()
+	db = getMySQLDB()
 	defer db.Close() // Ensure the database connection is closed when the function completes
 
 	rows, err := db.Query("SELECT id, name FROM contracts order by id desc")
@@ -91,14 +94,14 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 
 	var contractArray []string
 	contractArray = append(contractArray, "<table border='1' cellpadding='2' style='border-collapse:collapse; border:1px solid blue;'>")
-	contractArray = append(contractArray, "<tr class='bg-blue-600 text-white' style='font-weight:bold'><td style='text-align:center'>ID</td><td>Name</td><td></td></tr>")
+	contractArray = append(contractArray, "<tr class='bg-blue-600 text-white' style='font-weight:bold'><td style='text-align:center; width:5%'>ID</td><td style='width:75%;'>Name</td><td class='text-center'>Actions</td></tr>")
 
 	for rows.Next() {
 		var c Contract
 		if err := rows.Scan(&c.id, &c.name); err != nil {
 			log.Fatal(err) // Consider logging the error rather than killing the application
 		}
-		contractArray = append(contractArray, fmt.Sprintf("<tr><td style='text-align:center;'>%s.</td><td>%s</td><td style='text-align:center'>%s</td></tr>", c.id, c.name, "<a style='text-decoration:underline;' class='text-blue-500' href='/contract_home?id="+c.id+"'>Open</a>"))
+		contractArray = append(contractArray, fmt.Sprintf("<tr><td style='text-align:center;'>%s.</td><td>%s</td><td style='text-align:center'>%s</td></tr>", c.id, c.name, "<a style='text-decoration:underline;' class='text-blue-500' href='/contract_home?id="+c.id+"'>Open</a>  |  <a style='text-decoration:underline;' class='text-blue-500' href='#'>Hyperledger</a>"))
 	}
 	contractArray = append(contractArray, "</table>")
 
@@ -167,130 +170,181 @@ func newContractHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func contractBiddingHandler(w http.ResponseWriter, r *http.Request) {
-
-	contractId := r.URL.Query().Get("id")
-
-	if r.Method != http.MethodPost {
-
-		if contractId == "" {
-			// contractId is not set or is empty
-			http.Error(w, "Missing id parameter", http.StatusBadRequest)
-			return
-		}
-
-		db = getMySQLDB()
-
-		// Query the database for the contract by ID
-		rows, err := db.Query("SELECT id, name FROM contracts WHERE id=?", contractId)
-		if err != nil {
-			tmpl.ExecuteTemplate(w, "contract_bidding.html", struct {
-				Success bool
-				Status  bool
-				Title   string
-				Message template.HTML
-			}{Success: false, Status: false, Title: "Contract Bidding", Message: template.HTML("An error occurred loading the record")})
-			return
-		}
-		defer rows.Close()
-
-		// Check if there is a result
-		if !rows.Next() {
-			http.NotFound(w, r)
-			return
-		}
-
-		var id, name string
-		if err := rows.Scan(&id, &name); err != nil {
-			log.Printf("Error scanning rows: %v", err)
-			http.Error(w, "Error reading data", http.StatusInternalServerError)
-			return
-		}
-
-		// Render the contract data using a template
-		tmpl.ExecuteTemplate(w, "contract_bidding.html", struct {
-			Success bool
-			Status  bool
-			Title   string
-			Message string
-		}{Success: false, Status: true, Title: name, Message: contractId})
-
+	var contract_id = r.URL.Query().Get("id")
+	if contract_id == "" {
+		http.Error(w, "Missing query parameter", http.StatusBadRequest)
 		return
-
-	}
-
-	// if isPost implementation
-	bid := Bid{
-		contract_id:                    r.FormValue("contract_id"),
-		bidder_name:                    r.FormValue("bidder_name"),
-		bank_statement_submission:      r.FormValue("bank_statement_submission"),
-		bank_statement_score:           r.FormValue("bank_statement_score"),
-		bank_reference_submission:      r.FormValue("bank_reference_submission"),
-		cv_submission:                  r.FormValue("cv_submission"),
-		cv_score:                       r.FormValue("cv_score"),
-		certificate_submission:         r.FormValue("certificate_submission"),
-		certificate_score:              r.FormValue("certificate_score"),
-		awardletter_submission:         r.FormValue("awardletter_submission"),
-		awardletter_score:              r.FormValue("awardletter_score"),
-		completionletter_submission:    r.FormValue("completionletter_submission"),
-		completionletter_score:         r.FormValue("completionletter_score"),
-		equipment_submission:           r.FormValue("equipment_submission"),
-		equipment_score:                r.FormValue("equipment_score"),
-		equipment_ownership_submission: r.FormValue("equipment_ownership_submission"),
-		equipment_ownership_score:      r.FormValue("equipment_ownership_score"),
-		deviation_submission:           r.FormValue("deviation_submission"),
-		deviation_score:                r.FormValue("deviation_score"),
-		projects_submission:            r.FormValue("project_submission"),
-		projects_score:                 r.FormValue("projects_score"),
 	}
 
 	db = getMySQLDB()
-	contract_id, _ := strconv.Atoi(bid.contract_id)
-	bank_statement_submission, _ := strconv.Atoi(bid.bank_statement_submission)
-	bank_statement_score, _ := strconv.Atoi(bid.bank_statement_score)
-	bank_reference_submission, _ := strconv.Atoi(bid.bank_reference_submission)
-	bank_reference_score, _ := strconv.Atoi(bid.bank_reference_score)
-	cv_submission, _ := strconv.Atoi(bid.cv_submission)
-	cv_score, _ := strconv.Atoi(bid.cv_score)
-	certificate_submission, _ := strconv.Atoi(bid.certificate_submission)
-	certificate_score, _ := strconv.Atoi(bid.certificate_score)
-	awardletter_submission, _ := strconv.Atoi(bid.awardletter_submission)
-	awardletter_score, _ := strconv.Atoi(bid.awardletter_score)
-	completionletter_submission, _ := strconv.Atoi(bid.completionletter_submission)
-	completionletter_score, _ := strconv.Atoi(bid.completionletter_score)
-	equipment_submission, _ := strconv.Atoi(bid.equipment_submission)
-	equipment_score, _ := strconv.Atoi(bid.equipment_score)
-	equipment_ownership_submission, _ := strconv.Atoi(bid.equipment_ownership_submission)
-	equipment_ownership_score, _ := strconv.Atoi(bid.equipment_ownership_score)
-	deviation_submission, _ := strconv.Atoi(bid.deviation_submission)
-	deviation_score, _ := strconv.Atoi(bid.deviation_score)
-	projects_submission, _ := strconv.Atoi(bid.projects_submission)
-	projects_score, _ := strconv.Atoi(bid.projects_score)
+	defer db.Close()
 
-	//_, err := db.Exec("Insert into bids(contract_id) values (?)", contract_id)
+	var contractName string
 
-	_, err := db.Exec("Insert into bids(contract_id, bidder_name, bank_statement_submission, bank_statement_score, bank_reference_submission, bank_reference_score, cv_submission, cv_score, certificate_submission, certificate_score, awardletter_submission, awardletter_score, completionletter_submission, completionletter_score, equipment_submission, equipment_score, equipment_ownership_submission, equipment_ownership_score, deviation_submission, deviation_score, projects_submission, projects_score) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-		contract_id, bid.bidder_name, bank_statement_submission, bank_statement_score, bank_reference_submission, bank_reference_score, cv_submission, cv_score, certificate_submission, certificate_score, awardletter_submission, awardletter_score, completionletter_submission, completionletter_score, equipment_submission, equipment_score, equipment_ownership_submission, equipment_ownership_score, deviation_submission, deviation_score, projects_submission, projects_score)
+	err := db.QueryRow("Select name from contracts where id=?", contract_id).Scan(&contractName)
 
 	if err != nil {
-		tmpl.ExecuteTemplate(w, "contract_bidding.html", struct {
-			Success bool
-			Status  bool
-			Title   string
-			Message string
-		}{Success: true, Status: false, Title: "Contract", Message: err.Error()})
-
-		return
-	} else {
-		tmpl.ExecuteTemplate(w, "contract_bidding.html", struct {
-			Success bool
-			Status  bool
-			Title   string
-			Message string
-		}{Success: true, Status: true, Title: "Contract", Message: "The Bid Information has been successfully created and saved"})
+		http.Error(w, "Technical error"+err.Error(), http.StatusBadGateway)
 		return
 	}
 
-	//fmt.Println(r.FormValue("certificate_submission"))
+	if r.Method != http.MethodPost {
+		tmpl.ExecuteTemplate(w, "contract_bidding.html", struct {
+			Success      bool
+			Status       bool
+			ContractId   string
+			ContractName string
+			Message      template.HTML
+		}{Success: false, Status: false, ContractId: contract_id, ContractName: contractName, Message: template.HTML("")})
+		return
+	}
+
+	contract_id = r.URL.Query().Get("id")
+
+	type Bid struct {
+		id               string
+		contractId       string
+		bidderName       string
+		bankStatement    string
+		bankReference    string
+		cv               string
+		certificate      string
+		awardletter      string
+		completionletter string
+		equipment        string
+		ownership        string
+		auditedAccount   string
+		projects         string
+	}
+
+	var floatBankStatementScore float64
+	var floatBankReferenceScore float64
+	var floatCVScore float64
+	var floatCertificateScore float64
+	var floatAwardLetterScore float64
+	var floatCompletionLetterScore float64
+	var floatEquipmentScore float64
+	var floatOwnershipScore float64
+	var floatAuditedAccountScore float64
+	var floatProjectScore float64
+
+	// floatBankStatementScore, _ = strconv.ParseFloat(r.FormValue("bank_statement"), 64)
+	// floatBankReferenceScore, _ = strconv.ParseFloat(r.FormValue("bank_reference"), 64)
+
+	bid := Bid{
+		contractId:       contract_id,
+		bidderName:       r.FormValue("bidder_name"),
+		bankStatement:    r.FormValue("bank_statement"),
+		bankReference:    r.FormValue("bank_reference"),
+		cv:               r.FormValue("cv"),
+		certificate:      r.FormValue("certificate"),
+		awardletter:      r.FormValue("award_letter"),
+		completionletter: r.FormValue("completion_letter"),
+		equipment:        r.FormValue("equipment"),
+		ownership:        r.FormValue("ownership"),
+		auditedAccount:   r.FormValue("audited_account"),
+		projects:         r.FormValue("projects"),
+	}
+
+	/* fmt.Println("--------------- Struct Print-------------------")
+
+	fmt.Println("Bid BankStatement: " + bid.bankStatement)
+	fmt.Println("Bid bankReference: " + bid.bankReference)
+	*/
+	floatBankStatement, err := strconv.ParseFloat(bid.bankStatement, 64)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	floatBankStatementScore = floatBankStatement * 9.0
+
+	//fmt.Println("--------------- Float Bank Statement Computation -------------------")
+	//fmt.Println(floatBankStatementScore)
+
+	floatBankReference, err := strconv.ParseFloat(bid.bankReference, 64)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	floatBankReferenceScore = floatBankReference * 6.0
+
+	floatCV, err := strconv.ParseFloat(bid.cv, 64)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	floatCVScore = floatCV * 1.0
+
+	floatCertificate, err := strconv.ParseFloat(bid.certificate, 64)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	floatCertificateScore = floatCertificate * 1.5
+
+	floatAwardLetter, err := strconv.ParseFloat(bid.awardletter, 64)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	floatAwardLetterScore = floatAwardLetter * 1.0
+
+	floatCompletionLetter, err := strconv.ParseFloat(bid.completionletter, 64)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	floatCompletionLetterScore = floatCompletionLetter * 1.0
+
+	floatEquipment, err := strconv.ParseFloat(bid.equipment, 64)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	floatEquipmentScore = floatEquipment * 1.0
+
+	floatOwnership, err := strconv.ParseFloat(bid.ownership, 64)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	floatOwnershipScore = floatOwnership * 1.5
+
+	floatAuditedAccount, err := strconv.ParseFloat(bid.auditedAccount, 64)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	floatAuditedAccountScore = floatAuditedAccount * 1.5
+
+	floatProjects, err := strconv.ParseFloat(bid.projects, 64)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	floatProjectScore = floatProjects * 5
+
+	_, err = db.Exec("Insert into bids(contract_id, bidder_name, bank_statement, bank_statement_score, bank_reference, bank_reference_score, cv, cv_score, certificate, certificate_score, award_letter, award_letter_score, completion_letter, completion_letter_score, equipment, equipment_score, ownership, ownership_score, audited_account, audited_account_score, projects, projects_score) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		bid.contractId, bid.bidderName, bid.bankStatement, floatBankStatementScore, bid.bankReference, floatBankReferenceScore,
+		bid.cv, floatCVScore, bid.certificate, floatCertificateScore, bid.awardletter, floatAwardLetterScore,
+		bid.completionletter, floatCompletionLetterScore, bid.equipment, floatEquipmentScore,
+		bid.ownership, floatOwnershipScore, bid.auditedAccount, floatAuditedAccountScore,
+		bid.projects, floatProjectScore)
+
+	if err != nil {
+		tmpl.ExecuteTemplate(w, "contract_bidding.html", struct {
+			Success      bool
+			Status       bool
+			ContractId   string
+			ContractName string
+			Message      template.HTML
+		}{Success: true, Status: false, ContractId: contract_id, ContractName: contractName, Message: template.HTML(err.Error() + "<div class='py-2 mt-2'><a href='contract_home?id=" + contract_id + "' class='bg-blue-500 hover:bg-blue-400 rounded text-white px-8 py-2 text-sm'>Back to Contract Page</a></div>")})
+		return
+	}
+
+	tmpl.ExecuteTemplate(w, "contract_bidding.html", struct {
+		Success      bool
+		Status       bool
+		ContractId   string
+		ContractName string
+		Message      template.HTML
+	}{
+		Success:      true,
+		Status:       true,
+		ContractId:   contract_id,
+		ContractName: contractName,
+		Message:      template.HTML("Bidding has been successfully created. <div class='py-2 mt-2'><a href='contract_home?id=" + contract_id + "' class='bg-blue-500 hover:bg-blue-400 rounded text-white px-8 py-2 text-sm'>Back to Contract Page</a></div>")})
+
 }
 
 func contractHomeHandler(w http.ResponseWriter, r *http.Request) {
@@ -331,8 +385,7 @@ func contractHomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// -------------   Get Bid Information --------------------
-	rows, err = db.Query("SELECT id, contract_id, bidder_name, bank_statement_submission, bank_statement_score, bank_reference_submission, "+
-		"bank_reference_score, cv_submission, cv_score, certificate_submission, certificate_score FROM bids where contract_id=? order by id desc", id)
+	rows, err = db.Query("SELECT sub.id, sub.contract_id, sub.bidder_name,sub.financial_capability, sub.qualification, sub.similar_projects, sub.technical_capability, sub.audited_account, sub.projects, sub.financial_capability + sub.qualification + sub.similar_projects + sub.technical_capability + sub.audited_account + sub.projects AS total_score FROM ( SELECT id, contract_id, bidder_name, bank_statement_score + bank_reference_score AS financial_capability, cv_score + certificate_score AS qualification, award_letter_score + completion_letter_score AS similar_projects, equipment_score + ownership_score AS technical_capability, audited_account_score AS audited_account, projects_score AS projects FROM `bids` ) AS sub ORDER BY total_score DESC;")
 	if err != nil {
 		tmpl.ExecuteTemplate(w, "contract_home.html", struct {
 			Success bool
@@ -348,19 +401,18 @@ func contractHomeHandler(w http.ResponseWriter, r *http.Request) {
 
 	bidsArray = append(bidsArray, "<table border='1' cellpadding='2' style='border-collapse:collapse; border:1px solid blue;'>")
 	bidsArray = append(bidsArray, "<tr class='bg-blue-600 text-white' style='font-weight:bold'><td style='text-align:center'>ID</td><td>Bidder</td>"+
-		"<td>Bank<br/>Statement</td><td>Bank<br/>Reference</td><td>CV</td><td>Certificate</td>"+
-		"<td>Action</td></tr>")
+		"<td>Financial<br>Capability</td><td>Qualifications of<br/>Key Personnels</td><td>Similar Projects<br/>Executed</td><td>Relevant Equipment <br/>Technical Capability</td><td>Audited<br/>Accounts</td><td>Community<br/>Contributions</td>"+
+		"<td>Total<br/>Score</td><td>Action</td></tr>")
 
 	for rows.Next() {
-		var b Bid
-		if err := rows.Scan(&b.id, &b.contract_id, &b.bidder_name, &b.bank_statement_submission,
-			&b.bank_statement_score, &b.bank_reference_submission, &b.bank_reference_score, &b.cv_submission, &b.cv_score, &b.certificate_submission,
-			&b.certificate_score); err != nil {
+		var b BidSectionScore
+		if err := rows.Scan(&b.id, &b.contract_id, &b.bidder_name, &b.financial_capability, &b.qualification,
+			&b.similar_projects, &b.technical_capability, &b.audited_account, &b.projects, &b.total_score); err != nil {
 			log.Fatal(err) // Consider logging the error rather than killing the application
 		}
-		bidsArray = append(bidsArray, fmt.Sprintf("<tr><td style='text-align:center;'>%s.</td><td>%s</td><td>%s / %s</td><td>%s / %s</td><td>%s / %s</td><td>%s / %s</td><td style='text-align:center'>%s</td></tr>",
-			b.id, b.bidder_name, b.bank_statement_submission, b.bank_statement_score, b.bank_reference_submission, b.bank_reference_score, b.cv_submission, b.cv_score, b.certificate_submission, b.certificate_score,
-			"<a style='text-decoration:underline;' class='text-blue-500' href='/contract_home?id="+b.id+"'>Open</a>"))
+		bidsArray = append(bidsArray, fmt.Sprintf("<tr><td style='text-align:center;'>%s.</td><td class='text-center'>%s</td><td class='text-center'>%s </td><td class='text-center'>%s </td><td class='text-center'>%s </td><td class='text-center'>%s </td><td class='text-center'>%s </td><td class='text-center'>%s </td><td class='text-center bg-yellow-300 font-semibold'>%s </td><td style='text-align:center'>%s</td></tr>",
+			b.id, b.bidder_name, b.financial_capability, b.qualification, b.similar_projects, b.technical_capability, b.audited_account, b.projects, b.total_score,
+			"<a style='text-decoration:underline;' class='text-blue-500' href='/contract_home?id="+b.contract_id+"'>Open</a>"))
 	}
 	bidsArray = append(bidsArray, "</table>")
 

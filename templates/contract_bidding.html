@@ -2,7 +2,7 @@
 <!-- middle section -->
 <div id="middlesection" class="flex flex-col flex-1 border border-0 border-green-900 h-full align-items-start">
     <section class="px-8 py-4">
-        <h1 class="text-3xl">{{ .Title }}</h1>
+        <h1 class="text-3xl">{{ .ContractName }}</h1>
         <h4 class="text-xl">Contract Bidding</h4>
         
         
@@ -11,22 +11,12 @@
 
                     {{ if .Status}}
                         <div class='p-4 mt-8 mb-2 bg-green-100 rounded font-semibold md:w-1/2'>
-                            {{ .Message }}
-                            
-                                <div class="py-2 mt-2">
-                                    <a href="#" class="bg-blue-500 hover:bg-blue-400 
-                                                                 rounded text-white px-8 py-2 text-sm">Back to Contract</a>
-                                </div>
+                            {{ .Message }}                               
                             
                         </div>
                     {{ else}}
                         <div class='p-4 mt-8 mb-2 bg-red-100 text-red-800 rounded font-semibold md:w-1/2'>
-                            {{ .Message}}
-
-                            <div class="py-2 mt-2">
-                                <a href="#" class="bg-blue-500 hover:bg-blue-400 
-                                                             rounded text-white px-8 py-2 text-sm">Back to Contract</a>
-                            </div>
+                            {{ .Message}}                           
 
                         </div>
                     {{ end }}
@@ -36,7 +26,7 @@
 
         
         <!-- form-->
-        <form class="mt-4" action="/contract_bidding" method="POST">
+        <form class="mt-4" action="/contract_bidding?id={{.ContractId}}" method="POST">
 
 
                 <!-- Contract Id-->
@@ -69,14 +59,14 @@
                                 <div class="flex border border-0 border-red-500 w-64">
                                     <label class="text-gray-800 font-semibold py-1">Bank Statement</label>
                                 </div>
-                                <div class="border border-0 border-blue-900"> 
-                                    <input type="text" name="bank_statement_submission" class="flex border border-1 border-gray-500 inline-block 
-                                                              rounded-md py-2 px-2 w-1/2 shadow-lg" placeholder="Submission"required />
-                                </div>
-                                <div class="border border-0 border-blue-900"> 
-                                    <input type="text" name="bank_statement_score" class="flex border border-1 border-gray-500 inline-block 
-                                                              rounded-md py-2 px-2 w-1/2 shadow-lg" placeholder="Score" required/>
-                                </div>
+                                <div class="border border-0 border-blue-900">                                     
+                                        <select name="bank_statement" class="flex border border-1 border-gray-500 inline-block
+                                                              rounded-md py-2 px-4 shadow-lg border-blue-900 py-2 px-4" required>
+                                            <option>0</option>
+                                            <option>1</option>
+                                        </select>
+                                </div>           
+                                
                         </div>
                         <!-- end of fields - Bank Statement -->
                         
@@ -85,14 +75,15 @@
                             <div class="flex border border-0 border-red-500 w-64">
                                 <label class="text-gray-800 font-semibold py-1">Bank Reference</label>
                             </div>
-                            <div class="border border-0 border-blue-900"> 
-                                <input type="text" name="bank_reference_submission" class="flex border border-1 border-gray-500 inline-block 
-                                                          rounded-md py-2 px-2 w-1/2 shadow-lg" placeholder="Submission" required />
+                            <div class="border border-0 border-blue-900">                                
+                                <select name="bank_reference" class="flex border border-1 border-gray-500 inline-block 
+                                                                     rounded-md py-2 px-4 shadow-lg"
+                                                                     required >
+                                        <option>0</option>
+                                        <option>1</option>
+                                </select>
                             </div>
-                            <div class="border border-0 border-blue-900"> 
-                                <input type="text" name="bank_reference_score" class="flex border border-1 border-gray-500 inline-block 
-                                                          rounded-md py-2 px-2 w-1/2 shadow-lg" placeholder="Score" required/>
-                            </div>
+                            
                         </div>
                         <!-- end of fields - Bank Reference -->                        
                 </div>
@@ -111,13 +102,23 @@
                                 <label class="text-gray-800 font-semibold py-1">Curriculum Vitae</label>
                             </div>
                             <div class="border border-0 border-blue-900"> 
-                                <input type="text" name="cv_submission" class="flex border border-1 border-gray-500 inline-block 
-                                                          rounded-md py-2 px-2 w-1/2 shadow-lg" placeholder="Submission" required />
+                                
+                                        <select name="cv" class="flex border border-1 border-gray-500 inline-block 
+                                                                 rounded-md py-2 px-4 shadow-lg" required>
+                                                    <option>0</option>
+                                                    <option>1</option>
+                                                    <option>2</option>
+                                                    <option>3</option>
+                                                    <option>4</option>
+                                                    <option>5</option>
+                                                    <option>6</option>
+                                                    <option>7</option>
+                                                    <option>8</option>
+                                                    <option>9</option>
+                                                    <option>10</option>
+                                        </select>
                             </div>
-                            <div class="border border-0 border-blue-900"> 
-                                <input type="text" name="cv_score" class="flex border border-1 border-gray-500 inline-block 
-                                                          rounded-md py-2 px-2 w-1/2 shadow-lg" placeholder="Score" required/>
-                            </div>
+                           
                     </div>
                     <!-- end of fields - Curriculum Vitae -->
                     
@@ -127,13 +128,23 @@
                             <label class="text-gray-800 font-semibold py-1">Certificate</label>
                         </div>
                         <div class="border border-0 border-blue-900"> 
-                            <input type="text" name="certificate_submission" class="flex border border-1 border-gray-500 inline-block 
-                                                      rounded-md py-2 px-2 w-1/2 shadow-lg" placeholder="Submission" required />
+                           
+                                    <select name="certificate" class="flex border border-1 border-gray-500 inline-block 
+                                                                      rounded-md py-2 px-4 shadow-lg" required >
+                                        <option>0</option>
+                                        <option>1</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                        <option>4</option>
+                                        <option>5</option>
+                                        <option>6</option>
+                                        <option>7</option>
+                                        <option>8</option>
+                                        <option>9</option>
+                                        <option>10</option>
+                                    </select>
                         </div>
-                        <div class="border border-0 border-blue-900"> 
-                            <input type="text" name="certificate_score" class="flex border border-1 border-gray-500 inline-block 
-                                                      rounded-md py-2 px-2 w-1/2 shadow-lg" placeholder="Score" required/>
-                        </div>
+                        
                     </div>
                     <!-- end of fields - Certificate -->
                     
@@ -148,37 +159,56 @@
                     <h3 class="text-xl font-semibold">Similar Project Executed</h3>
                 </div>
                 
-                <!-- fields - Curriculum Vitae -->
+                <!-- fields - Award Letter -->
                 <div class="flex flex-row align-items-center border-b border-1 border-gray-300 py-2">
                         <div class="flex border border-0 border-red-500 w-64">
                             <label class="text-gray-800 font-semibold py-1">Award Letter</label>
                         </div>
-                        <div class="border border-0 border-blue-900"> 
-                            <input type="text" name="awardletter_submission" class="flex border border-1 border-gray-500 inline-block 
-                                                      rounded-md py-2 px-2 w-1/2 shadow-lg" placeholder="Submission" required/>
-                        </div>
-                        <div class="border border-0 border-blue-900"> 
-                            <input type="text" name="awardletter_score" class="flex border border-1 border-gray-500 inline-block 
-                                                      rounded-md py-2 px-2 w-1/2 shadow-lg" placeholder="Score" required/>
-                        </div>
+                        <div class="border border-0 border-blue-900">
+                                <select name="award_letter" 
+                                        class="flex border border-1 border-gray-500 inline-block 
+                                               rounded-md py-2 px-4 shadow-lg" required>
+                                    <option>0</option>
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                    <option>4</option>
+                                    <option>5</option>
+                                    <option>6</option>
+                                    <option>7</option>
+                                    <option>8</option>
+                                    <option>9</option>
+                                    <option>10</option>
+                                </select>
+                        </div>                        
                 </div>
-                <!-- end of fields - Curriculum Vitae -->
+                <!-- end of fields - Award Letter -->
                 
-                <!-- fields - Certificate -->
+                <!-- fields - Completion Letter -->
                 <div class="flex flex-row align-items-center border-gray-300 py-2">
                     <div class="flex border border-0 border-red-500 w-64">
                         <label class="text-gray-800 font-semibold py-1">Completion Letter</label>
                     </div>
                     <div class="border border-0 border-blue-900"> 
-                        <input type="text" name="completionletter_submission" class="flex border border-1 border-gray-500 inline-block 
-                                                  rounded-md py-2 px-2 w-1/2 shadow-lg" placeholder="Submission" required />
+                                    <select name="completion_letter" class="flex border border-1 border-gray-500 inline-block 
+                                                            rounded-md py-2 px-4 shadow-lg"
+                                                             required>
+                                            <option>0</option>
+                                            <option>1</option>
+                                            <option>2</option>
+                                            <option>3</option>
+                                            <option>4</option>
+                                            <option>5</option>
+                                            <option>6</option>
+                                            <option>7</option>
+                                            <option>8</option>
+                                            <option>9</option>
+                                            <option>10</option>
+                                    </select>                    
                     </div>
-                    <div class="border border-0 border-blue-900"> 
-                        <input type="text" name="completionletter_score" class="flex border border-1 border-gray-500 inline-block 
-                                                  rounded-md py-2 px-2 w-1/2 shadow-lg" placeholder="Score" required/>
-                    </div>
+                    
                 </div>
-                <!-- end of fields - Certificate -->                
+                <!-- end of fields - Completion Letter -->                
         </div>
         <!-- end of Similar Project Executed -->
 
@@ -186,7 +216,7 @@
 
         
         <!-- Technical Capability -->
-            <div class="flex flex-col border border-1 border-gray-200 rounded-sm px-2 py-2 mt-2 mb-2">
+         <div class="flex flex-col border border-1 border-gray-200 rounded-sm px-2 py-2 mt-2 mb-2">
                 <div class="mt-1 mb-1">
                     <h3 class="text-xl font-semibold">Relevant Equipment and Technical capacity</h3>
                 </div>
@@ -194,32 +224,52 @@
                 <!-- fields - Equipment -->
                 <div class="flex flex-row align-items-center border-b border-1 border-gray-300 py-2">
                         <div class="flex border border-0 border-red-500 w-64">
-                            <label class="text-gray-800 font-semibold py-1">No. of Equipment</label>
+                            <label for="equipment" class="text-gray-800 font-semibold py-1">No. of Equipment</label>
                         </div>
-                        <div class="border border-0 border-blue-900"> 
-                            <input type="text" name="equipment_submission" class="flex border border-1 border-gray-500 inline-block 
-                                                      rounded-md py-2 px-2 w-1/2 shadow-lg" placeholder="Submission" required />
+                        <div class="border border-0 border-blue-900">                            
+                                            <select name="equipment" class="flex border border-1 border-gray-500 inline-block 
+                                                                            rounded-md py-2 px-4 shadow-lg" required>
+                                                        <option>0</option>
+                                                        <option>1</option>
+                                                        <option>2</option>
+                                                        <option>3</option>
+                                                        <option>4</option>
+                                                        <option>5</option>
+                                                        <option>6</option>
+                                                        <option>7</option>
+                                                        <option>8</option>
+                                                        <option>9</option>
+                                                        <option>10</option>
+                                            </select>
+
                         </div>
-                        <div class="border border-0 border-blue-900"> 
-                            <input type="text" name="equipment_score" class="flex border border-1 border-gray-500 inline-block 
-                                                      rounded-md py-2 px-2 w-1/2 shadow-lg" placeholder="Score" required/>
-                        </div>
+                        
                 </div>
                 <!-- end of fields - No. of Equipment -->
                 
                 <!-- fields - Evidence of Ownership -->
                 <div class="flex flex-row align-items-center border-gray-300 py-2">
                     <div class="flex border border-0 border-red-500 w-64">
-                        <label class="text-gray-800 font-semibold py-1">Evidence of Ownership</label>
+                        <label for="ownership" class="text-gray-800 font-semibold py-1">Evidence of Ownership</label>
                     </div>
                     <div class="border border-0 border-blue-900"> 
-                        <input type="text" name="equipment_ownership_submission" class="flex border border-1 border-gray-500 inline-block 
-                                                  rounded-md py-2 px-2 w-1/2 shadow-lg" placeholder="Submission" required />
+                        
+                                <select name="ownership" class="flex border border-1 border-gray-500 inline-block 
+                                                                rounded-md py-2 px-4 shadow-lg" required>
+                                    <option>0</option>
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                    <option>4</option>
+                                    <option>5</option>
+                                    <option>6</option>
+                                    <option>7</option>
+                                    <option>8</option>
+                                    <option>9</option>
+                                    <option>10</option>
+                                </select>
                     </div>
-                    <div class="border border-0 border-blue-900"> 
-                        <input type="text" name="equipment_ownership_score" class="flex border border-1 border-gray-500 inline-block 
-                                                  rounded-md py-2 px-2 w-1/2 shadow-lg" placeholder="Score" required/>
-                    </div>
+                    
                 </div>
                 <!-- end of fields - Evidence of Ownership -->
         </div>
@@ -237,16 +287,20 @@
                 <!-- fields - Deviation (Annual Turnover, Benchmark) -->
                 <div class="flex flex-row align-items-center py-2">
                         <div class="flex border border-0 border-red-500 w-64">
-                            <label class="text-gray-800 font-semibold py-1">Deviation (Annual Turnover, Benchmark)</label>
+                            <label for="audited_account" class="text-gray-800 font-semibold py-1">Deviation (Annual Turnover, Benchmark)</label>
                         </div>
-                        <div class="border border-0 border-blue-900"> 
-                            <input type="text" name="deviation_submission" class="flex border border-1 border-gray-500 inline-block 
-                                                      rounded-md py-2 px-2 w-1/2 shadow-lg" placeholder="Submission" required/>
+                        <div class="border border-0 border-blue-900">                            
+                                    <select name="audited_account" class="flex border border-1 border-gray-500 inline-block 
+                                                                          rounded-md py-2 px-4 shadow-lg">
+                                        <option>0</option>
+                                        <option>1</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                        <option>4</option>
+                                        <option>5</option>                
+                                    </select>
                         </div>
-                        <div class="border border-0 border-blue-900"> 
-                            <input type="text" name="deviation_score" class="flex border border-1 border-gray-500 inline-block 
-                                                      rounded-md py-2 px-2 w-1/2 shadow-lg" placeholder="Score" required/>
-                        </div>
+                        
                 </div>
                 <!-- end of fields - Deviation (Annual Turnover, Benchmark) -->               
                 
@@ -263,27 +317,35 @@
             <!-- fields - Deviation (Annual Turnover, Benchmark) -->
             <div class="flex flex-row align-items-center  py-2">
                     <div class="flex border border-0 border-red-500 w-64">
-                        <label class="text-gray-800 font-semibold py-1">No. of Project & Average worth</label>
+                        <label for="projects" class="text-gray-800 font-semibold py-1">No. of Project & Average worth</label>
                     </div>
                     <div class="border border-0 border-blue-900"> 
-                        <input type="text" name="projects_submission" class="flex border border-1 border-gray-500 inline-block 
-                                                  rounded-md py-2 px-2 w-1/2 shadow-lg" placeholder="Submission" required />
+                        
+                                <select name="projects" class="flex border border-1 border-gray-500 inline-block 
+                                                               rounded-md py-2 px-4 shadow-lg" required>
+                                        <option>0</option>
+                                        <option>1</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                        <option>4</option>
+                                        <option>5</option>                
+                                    </select>
+                                </div>
                     </div>
-                    <div class="border border-0 border-blue-900"> 
-                        <input type="text" name="projects_score" class="flex border border-1 border-gray-500 inline-block 
-                                                  rounded-md py-2 px-2 w-1/2 shadow-lg" placeholder="Score" required/>
-                    </div>
+                    
             </div>
             <!-- end of fields - No. of Project & Average worth -->      
             
-            
-    </div>
-    <!-- end of Contribution to Community -->
+            <!-- end of Contribution to Community -->
 
-    <div class="py-2">
-        <button type="submit" class="bg-blue-500 hover:bg-blue-400 
-                                     rounded text-white px-8 py-2 text-sm">Create Bid</button>
+            <div class="py-2">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-400 
+                                             rounded text-white px-8 py-2 text-sm">Create Bid</button>
+            </div>
     </div>
+    
+
+   
 
 
 
